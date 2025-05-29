@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Врач: {{ doctor.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-lg p-4">
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    {% if doctor.photo %}
+                        <img src="{{ doctor.photo.url }}" class="img-fluid rounded-circle shadow-sm" alt="{{ doctor.get_full_name }}" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'img/default_doctor.png' %}" class="img-fluid rounded-circle shadow-sm" alt="[Image of Default Doctor]" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% endif %}
+                    <h4 class="mt-3 mb-1">{{ doctor.get_full_name }}</h4>
+                    <p class="text-muted">{{ doctor.category.name }}</p>
+                </div>
+                <div class="col-md-8">
+                    <h2 class="mb-3 text-primary">{{ doctor.get_full_name }}</h2>
+                    <ul class="list-unstyled">
+                        {# Удалены поля Специализация, Образование, Опыт работы #}
+                        <li class="mb-2"><i class="fas fa-user-tie me-2 text-info"></i><strong>Категория:</strong> {{ doctor.category.name }}</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2 text-info"></i><strong>Телефон:</strong> {% if doctor.phone_number %}{{ doctor.phone_number }}{% else %}Не указан{% endif %}</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2 text-info"></i><strong>Email:</strong> {% if doctor.email %}{{ doctor.email }}{% else %}Не указан{% endif %}</li>
+                    </ul>
+                    
+                    <h5 class="mt-4 mb-2">О враче:</h5>
+                    <p class="text-justify">{{ doctor.description|default:"Подробное описание пока отсутствует." }}</p>
+
+                    <div class="mt-4 text-center">
+                        {# Кнопка "Записаться на прием" теперь передает ID врача #}
+                        <a href="{% url 'core:book_appointment' %}?doctor_id={{ doctor.id }}" class="btn btn-success btn-lg me-3"><i class="fas fa-calendar-check me-2"></i>Записаться на прием</a>
+                        <a href="{% url 'core:contacts' %}" class="btn btn-secondary btn-lg"><i class="fas fa-arrow-left me-2"></i>Назад к врачам</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

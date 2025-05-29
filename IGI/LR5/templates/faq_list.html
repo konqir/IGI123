@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <h1 class="text-center mb-4">Часто задаваемые вопросы</h1>
+
+        {% if faqs %}
+            <div class="accordion" id="faqAccordion">
+                {% for faq in faqs %}
+                <div class="card mb-2 shadow-sm">
+                    <div class="card-header" id="heading{{ forloop.counter }}">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link btn-block text-start w-100 collapsed text-decoration-none text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                                {{ faq.question }}
+                            </button>
+                        </h2>
+                    </div>
+
+                    <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#faqAccordion">
+                        <div class="card-body">
+                            <p>{{ faq.answer|linebreaksbr }}</p>
+                            <p class="text-muted small text-end">Добавлено: {{ faq.date_added|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Пагинация #}
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a></li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                На данный момент вопросы и ответы не добавлены.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

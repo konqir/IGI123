@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <h1 class="text-center mb-4">Добро пожаловать в Косметологический центр!</h1>
+        <p class="lead text-center">Ваша красота - наша забота. Откройте для себя мир профессионального ухода и преображения.</p>
+
+        <hr class="my-5">
+
+        {# Блок с последней новостью #}
+        <div class="card p-4 mb-4 text-center shadow-sm">
+            {% if latest_article %}
+                <h3 class="card-title text-primary mb-3">Последние новости: {{ latest_article.title }}</h3>
+                {% if latest_article.image %}
+                    <img src="{{ latest_article.image.url }}" class="img-fluid rounded mb-3 mx-auto" alt="[Image of News Article]" style="max-height: 250px; object-fit: cover;">
+                {% endif %}
+                <p class="card-text lead">{{ latest_article.brief_content|linebreaksbr }}</p>
+                <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-4">
+                    <a href="{% url 'core:news_detail' slug=latest_article.slug %}" class="btn btn-primary btn-lg"><i class="fas fa-newspaper me-2"></i>Читать новость</a>
+                    <a href="{% url 'core:news_list' %}" class="btn btn-outline-primary btn-lg"><i class="fas fa-list-alt me-2"></i>Все новости</a>
+                </div>
+            {% else %}
+                <h3 class="card-title text-primary mb-3">Откройте для себя наши услуги!</h3>
+                <p class="card-text lead">Мы предлагаем широкий спектр косметологических процедур для вашей красоты и здоровья. Запишитесь на прием уже сегодня!</p>
+                <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-4">
+                    <a href="{% url 'core:service_list' %}" class="btn btn-primary btn-lg"><i class="fas fa-spa me-2"></i>Посмотреть услуги</a>
+                    <a href="{% url 'core:book_appointment' %}" class="btn btn-outline-primary btn-lg"><i class="fas fa-calendar-check me-2"></i>Записаться онлайн</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="text-center mt-5">
+            <h3>Наши преимущества:</h3>
+            <div class="row mt-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 p-3 text-center shadow-sm">
+                        <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Высокий профессионализм</h5>
+                        <p class="card-text">Опытные врачи и косметологи с многолетним стажем.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 p-3 text-center shadow-sm">
+                        <i class="fas fa-hand-holding-heart fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">Индивидуальный подход</h5>
+                        <p class="card-text">Программы ухода, разработанные специально для вас.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 p-3 text-center shadow-sm">
+                        <i class="fas fa-gem fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Современные технологии</h5>
+                        <p class="card-text">Используем только передовое оборудование и методики.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Удалены секция "Наши популярные услуги" и кнопка "Посмотреть все услуги" #}
+
+    </div>
+</div>
+{% endblock %}

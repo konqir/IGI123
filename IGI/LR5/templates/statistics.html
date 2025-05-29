@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %} {# Убедитесь, что эта строка присутствует #}
+
+{% block title %}Статистика центра - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Статистика центра</h1>
+
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-chart-line me-2"></i>Общие финансовые показатели</h5>
+                    <p class="card-text"><strong>Общая сумма продаж (завершенные записи):</strong> {{ total_sales|floatformat:2 }} BYN</p>
+                    <hr>
+                    <h6 class="card-subtitle mb-2 text-muted">Статистика по суммам продаж (завершенные записи):</h6>
+                    <p class="card-text"><strong>Среднее:</strong> {{ sales_mean|floatformat:2 }} BYN</p>
+                    <p class="card-text"><strong>Мода:</strong> 
+                        {% if sales_mode %}
+                            {% for mode in sales_mode %}
+                                {{ mode|floatformat:2 }} BYN{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            Нет данных
+                        {% endif %}
+                    </p>
+                    <p class="card-text"><strong>Медиана:</strong> {{ sales_median|floatformat:2 }} BYN</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-users me-2"></i>Статистика по клиентам</h5>
+                    <p class="card-text"><strong>Средний возраст клиентов:</strong> {{ client_age_mean|floatformat:1 }} лет</p>
+                    <p class="card-text"><strong>Медианный возраст клиентов:</strong> {{ client_age_median|floatformat:1 }} лет</p>
+                    <hr>
+                    <h6 class="card-subtitle mb-2 text-muted">Клиенты (в алфавитном порядке):</h6>
+                    {% if clients_alphabetical %}
+                        <ul class="list-group list-group-flush">
+                            {% for client in clients_alphabetical %}
+                                <li class="list-group-item">{{ client.user.last_name }} {{ client.user.first_name }} ({{ client.user.username }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="card-text">Нет данных о клиентах.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-tags me-2"></i>Популярность услуг</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Наиболее популярные категории услуг (по количеству записей):</h6>
+                    {% if popular_service_types %}
+                        <ul class="list-group list-group-flush">
+                            {% for item in popular_service_types %}
+                                <li class="list-group-item">{{ item.service__category__name }}: {{ item.count }} записей</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="card-text">Нет данных о популярных услугах.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-money-bill-wave me-2"></i>Прибыльность услуг</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Категории услуг, приносящие наибольшую прибыль:</h6>
+                    {% if profitable_service_types %}
+                        <ul class="list-group list-group-flush">
+                            {% for item in profitable_service_types %}
+                                <li class="list-group-item">{{ item.service__category__name }}: {{ item.total_revenue|floatformat:2 }} BYN</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="card-text">Нет данных о прибыльных услугах.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title text-primary text-center mb-4"><i class="fas fa-chart-bar me-2"></i>Загруженность кабинетов (количество записей за последние 6 месяцев)</h5>
+                {# Добавлен div для контроля размера графика #}
+                <div style="position: relative; height:40vh; width:80vw; margin: 0 auto;"> 
+                    <canvas id="roomOccupancyChart"></canvas> {# Изменено ID #}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-list-alt me-2"></i>Услуги (в алфавитном порядке)</h5>
+                    {% if services_alphabetical %}
+                        <ul class="list-group list-group-flush">
+                            {% for service in services_alphabetical %}
+                                <li class="list-group-item">{{ service.name }} ({{ service.category.name|default:"Без категории" }}) - {{ service.price|floatformat:2 }} BYN</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="card-text">Нет данных об услугах.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12 text-center">
+            <p class="text-muted small">
+                Текущая дата и время: <span id="current-datetime-display"></span> (<span id="current-timezone-display"></span>)
+            </p>
+        </div>
+    </div>
+
+    {# Новый блок для календаря #}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title text-primary text-center mb-4"><i class="fas fa-calendar-alt me-2"></i>Календарь текущего месяца</h5>
+                <div id="calendar-container" class="text-center">
+                    {# Календарь будет сгенерирован здесь с помощью JavaScript #}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Динамическое обновление даты и времени ---
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // 24-часовой формат
+            };
+            const formattedDateTime = now.toLocaleString('ru-RU', options);
+            
+            // Получаем название временной зоны. Если браузер не поддерживает, используем fallback.
+            let timezoneName;
+            try {
+                timezoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            } catch (e) {
+                timezoneName = 'UTC'; // Fallback
+            }
+
+            const datetimeDisplay = document.getElementById('current-datetime-display');
+            const timezoneDisplay = document.getElementById('current-timezone-display');
+
+            if (datetimeDisplay) {
+                datetimeDisplay.textContent = formattedDateTime;
+            }
+            if (timezoneDisplay) {
+                timezoneDisplay.textContent = timezoneName;
+            }
+        }
+
+        // Обновляем каждую секунду
+        setInterval(updateDateTime, 1000);
+        // Вызываем сразу при загрузке страницы
+        updateDateTime();
+
+        // --- Инициализация графика Chart.js: Загруженность кабинетов ---
+        const ctx = document.getElementById('roomOccupancyChart'); 
+        
+        if (!ctx) {
+            console.error("Canvas element with ID 'roomOccupancyChart' not found. Chart will not be rendered.");
+            return; 
+        }
+
+        const labels = JSON.parse('{{ room_labels_json|escapejs }}'); 
+        const data = JSON.parse('{{ room_appointment_counts_json|escapejs }}'); 
+
+        new Chart(ctx, {
+            type: 'bar', 
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Количество записей',
+                    data: data,
+                    backgroundColor: 'rgba(74, 144, 226, 0.6)', 
+                    borderColor: 'rgba(74, 144, 226, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, 
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество записей'
+                        },
+                        ticks: {
+                            precision: 0 
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Кабинет' 
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false 
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Генерация текстового календаря ---
+        function generateCalendar() {
+            const calendarContainer = document.getElementById('calendar-container');
+            if (!calendarContainer) {
+                console.error("Calendar container not found.");
+                return;
+            }
+
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            const currentDay = today.getDate();
+
+            // Названия месяцев и дней недели
+            const monthNames = [
+                "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+            ];
+            const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+            // Определяем первый день месяца (0=Вс, 1=Пн, ..., 6=Сб)
+            // Мы хотим, чтобы неделя начиналась с понедельника, поэтому корректируем.
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+            const startDayIndex = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; // Корректировка для понедельника
+
+            // Количество дней в текущем месяце
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            let calendarHtml = `
+                <h6 class="mb-3">${monthNames[currentMonth]} ${currentYear}</h6>
+                <div class="d-flex justify-content-center mb-2">
+                    ${dayNames.map(day => `<span class="col-1 fw-bold text-center">${day}</span>`).join('')}
+                </div>
+                <div class="d-flex flex-wrap justify-content-center">
+            `;
+
+            // Добавляем пустые ячейки для дней до начала месяца
+            for (let i = 0; i < startDayIndex; i++) {
+                calendarHtml += `<span class="col-1 text-center text-muted"></span>`;
+            }
+
+            // Добавляем дни месяца
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = (day === currentDay && currentMonth === today.getMonth() && currentYear === today.getFullYear());
+                const dayClass = isToday ? 'bg-primary text-white rounded-circle fw-bold' : 'text-dark';
+                calendarHtml += `<span class="col-1 text-center py-1 ${dayClass}">${day}</span>`;
+            }
+
+            calendarHtml += `</div>`;
+            calendarContainer.innerHTML = calendarHtml;
+        }
+
+        // Генерируем календарь при загрузке страницы
+        generateCalendar();
+    });
+</script>
+{% endblock %}

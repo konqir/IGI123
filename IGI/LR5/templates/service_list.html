@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Услуги - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <h1 class="text-center mb-4">Наши услуги</h1>
+        <p class="lead text-center mb-5">Полный список косметологических услуг, предлагаемых нашим центром.</p>
+
+        {# Кнопка "Добавить услугу" - видна только суперпользователям #}
+        {% if user.is_superuser %}
+        <div class="text-center mb-4">
+            <a href="{% url 'core:add_service' %}" class="btn btn-success btn-lg">
+                <i class="fas fa-plus-circle me-2"></i>Добавить новую услугу
+            </a>
+        </div>
+        {% endif %}
+
+        {# Форма фильтрации, поиска и сортировки #}
+        <div class="card shadow-sm mb-4 p-3">
+            <h5 class="mb-3">Фильтры и поиск</h5>
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="category" class="form-label">Категория:</label>
+                    <select class="form-select rounded" id="category" name="category">
+                        <option value="">Все категории</option>
+                        {# ИСПРАВЛЕНО: Удален лишний '%' #}
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category.id|stringformat:"s" == current_category %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="min_price" class="form-label">Мин. цена:</label>
+                    <input type="number" step="0.01" class="form-control rounded" id="min_price" name="min_price" value="{{ current_min_price }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="max_price" class="form-label">Макс. цена:</label>
+                    <input type="number" step="0.01" class="form-control rounded" id="max_price" name="max_price" value="{{ current_max_price }}">
+                </div>
+                <div class="col-md-8">
+                    <label for="q" class="form-label">Поиск по названию/описанию:</label>
+                    <input type="text" class="form-control rounded" id="q" name="q" placeholder="Найти услугу..." value="{{ current_search_query }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="sort_by" class="form-label">Сортировать по:</label>
+                    <select class="form-select rounded" id="sort_by" name="sort_by">
+                        <option value="name" {% if current_sort_by == 'name' %}selected{% endif %}>Названию (А-Я)</option>
+                        <option value="-name" {% if current_sort_by == '-name' %}selected{% endif %}>Названию (Я-А)</option>
+                        <option value="price" {% if current_sort_by == 'price' %}selected{% endif %}>Цене (возрастание)</option>
+                        <option value="-price" {% if current_sort_by == '-price' %}selected{% endif %}>Цене (убывание)</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary w-100 rounded"><i class="fas fa-filter me-2"></i>Применить фильтры</button>
+                </div>
+            </form>
+        </div>
+
+        {% if services %}
+            <div class="list-group">
+                {% for service in services %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 rounded shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 text-primary">{{ service.name }}</h5>
+                        <small class="text-muted">{{ service.price }} руб. ({{ service.duration_minutes }} мин.)</small>
+                    </div>
+                    {% if service.category %}
+                        <p class="mb-1 text-muted">Категория: {{ service.category.name }}</p>
+                    {% endif %}
+                    <p class="mb-1">{{ service.description|default:"Описание отсутствует." }}</p>
+                    
+                    <div class="d-flex justify-content-end mt-3">
+                        <a href="{% url 'core:service_detail' pk=service.pk %}" class="btn btn-info btn-sm me-2">
+                            <i class="fas fa-info-circle me-1"></i>Подробнее
+                        </a>
+                        {# Кнопки редактирования и удаления - видны только суперпользователям #}
+                        {% if user.is_superuser %}
+                            <a href="{% url 'core:edit_service' pk=service.pk %}" class="btn btn-warning btn-sm me-2">
+                                <i class="fas fa-edit me-1"></i>Редактировать
+                            </a>
+                            <a href="{% url 'core:delete_service' pk=service.pk %}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt me-1"></i>Удалить
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Пагинация #}
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&category={{ current_category }}&min_price={{ current_min_price }}&max_price={{ current_max_price }}&q={{ current_search_query }}&sort_by={{ current_sort_by }}">Предыдущая</a></li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}&category={{ current_category }}&min_price={{ current_min_price }}&max_price={{ current_max_price }}&q={{ current_search_query }}&sort_by={{ current_sort_by }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&category={{ current_category }}&min_price={{ current_min_price }}&max_price={{ current_max_price }}&q={{ current_search_query }}&sort_by={{ current_sort_by }}">Следующая</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                Услуги не найдены по вашему запросу. Попробуйте изменить фильтры или поиск.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

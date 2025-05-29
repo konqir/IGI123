@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }} - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h1 class="card-title text-center mb-4 text-primary">{{ article.title }}</h1>
+                <p class="text-muted text-center small mb-4">Опубликовано: {{ article.published_date|date:"d/m/Y H:i" }}</p>
+
+                {% if article.image %}
+                    <div class="text-center mb-4">
+                        <img src="{{ article.image.url }}" class="img-fluid rounded" alt="[Image of News Article]" style="max-height: 400px; object-fit: cover;">
+                    </div>
+                {% endif %}
+
+                <div class="article-content">
+                    <p class="lead">{{ article.brief_content|linebreaksbr }}</p>
+                    <hr>
+                    <p>{{ article.full_content|linebreaksbr }}</p>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a href="{% url 'core:news_list' %}" class="btn btn-outline-secondary btn-lg"><i class="fas fa-arrow-left me-2"></i>Назад к новостям</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

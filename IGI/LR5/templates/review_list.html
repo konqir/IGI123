@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Отзывы - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <h1 class="text-center mb-4">Отзывы наших клиентов</h1>
+        <p class="lead text-center mb-5">Мы ценим ваше мнение! Поделитесь своим опытом.</p>
+
+        <div class="text-center mb-4">
+            {% if user.is_authenticated %}
+                <a href="{% url 'core:add_review' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Оставить отзыв
+                </a>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    Для того чтобы оставить отзыв, пожалуйста, <a href="{% url 'accounts:login' %}" class="alert-link">войдите</a> или <a href="{% url 'accounts:register' %}" class="alert-link">зарегистрируйтесь</a>.
+                </div>
+            {% endif %}
+        </div>
+
+        {% if reviews %}
+            <div class="list-group">
+                {% for review in reviews %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 rounded shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 text-primary">{{ review.client.user.get_full_name }}</h5>
+                        <small class="text-muted">{{ review.date_posted|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <div class="mb-2">
+                        {% for _ in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                                <i class="far fa-star text-secondary"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 text-muted">{{ review.rating }} из 5</span>
+                    </div>
+                    {% if review.doctor %}
+                        <p class="mb-1 text-muted">Врач: {{ review.doctor.get_full_name }}</p>
+                    {% endif %}
+                    {% if review.service %}
+                        <p class="mb-1 text-muted">Услуга: {{ review.service.name }}</p>
+                    {% endif %}
+                    <p class="mb-1">{{ review.text|linebreaksbr }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Пагинация #}
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a></li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                На данный момент отзывов нет. Будьте первым!
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

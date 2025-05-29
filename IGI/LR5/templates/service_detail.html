@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ service.name }} - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h1 class="card-title text-center mb-4 text-primary">{{ service.name }}</h1>
+                <p class="lead text-center mb-4">{{ service.description|default:"Описание услуги отсутствует." }}</p>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="fs-4 fw-bold text-success">Цена: {{ service.price }} руб.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p class="text-muted">Категория: {{ service.category.name|default:"Без категории" }}</p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    {# Кнопка "Записаться на услугу" #}
+                    <a href="{% url 'core:book_appointment' %}?service_id={{ service.id }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-calendar-alt me-2"></i>Записаться на эту услугу
+                    </a>
+                    <a href="{% url 'core:service_list' %}" class="btn btn-outline-secondary btn-lg ms-3">
+                        <i class="fas fa-arrow-left me-2"></i>Вернуться к списку услуг
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

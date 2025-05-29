@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель врача - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-9">
+        <h1 class="text-center mb-4">Панель врача</h1>
+        <p class="lead text-center mb-5">Добро пожаловать, {{ user.get_full_name|default:user.username }}!</p>
+
+        {% if doctor %}
+            <div class="card shadow-sm mb-5 p-4">
+                <h3 class="card-title text-primary mb-4 text-center">Ваш профиль</h3>
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        {% if doctor.photo %}
+                            <img src="{{ doctor.photo.url }}" class="img-fluid rounded-circle shadow-sm" alt="[Image of Doctor]" style="width: 120px; height: 120px; object-fit: cover;">
+                        {% else %}
+                            <img src="https://placehold.co/120x120/e0e0e0/555555?text=Нет+фото" class="img-fluid rounded-circle shadow-sm" alt="[Image of Default Doctor]" style="width: 120px; height: 120px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-9">
+                        <p class="fs-5 mb-1"><strong>Имя:</strong> {{ doctor.get_full_name }}</p>
+                        <p class="mb-1"><strong>Категория:</strong> {{ doctor.category.name|default:"Не указана" }}</p>
+                        <p class="mb-1"><strong>Телефон:</strong> {{ doctor.phone_number|default:"Не указан" }}</p>
+                        <p class="mb-1"><strong>Email:</strong> {{ doctor.email|default:"Не указан" }}</p>
+                        <p class="mb-0"><strong>Описание:</strong> {{ doctor.description|default:"Не указано"|truncatechars:100 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-center mb-4">Предстоящие записи</h3>
+            {% if appointments %}
+                <div class="list-group mb-5">
+                    {% for appointment in appointments %}
+                        <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 rounded shadow-sm">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1 text-primary">Клиент: {{ appointment.client.user.get_full_name|default:appointment.client.user.username }}</h5>
+                                <small class="text-muted">{{ appointment.date|date:"d/m/Y" }} в {{ appointment.start_time|time:"H:i" }} - {{ appointment.end_time|time:"H:i" }}</small>
+                            </div>
+                            <p class="mb-1"><strong>Услуга:</strong> {{ appointment.service.name|default:"Не указана" }}</p>
+                            <p class="mb-1"><strong>Статус:</strong> <span class="badge {% if appointment.status == 'planned' %}bg-info{% elif appointment.status == 'completed' %}bg-success{% elif appointment.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">{{ appointment.get_status_display }}</span></p>
+                            <p class="mb-1"><strong>Итоговая стоимость:</strong> {{ appointment.total_price|floatformat:2 }} руб.</p>
+                            <p class="mb-0"><strong>Примечания:</strong> {{ appointment.notes|default:"Нет примечаний" }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center" role="alert">
+                    У вас пока нет предстоящих записей.
+                </div>
+            {% endif %}
+
+            <h3 class="text-center mb-4">Ваше расписание</h3>
+            {% if schedules %}
+                <div class="list-group">
+                    {% for schedule in schedules %}
+                        <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 rounded shadow-sm">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1 text-primary">Дата: {{ schedule.date|date:"d/m/Y" }}</h5>
+                                <small class="text-muted">Время: {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</small>
+                            </div>
+                            <p class="mb-0"><strong>Кабинет:</strong> {{ schedule.room.name|default:"Не указан" }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center" role="alert">
+                    Ваше расписание пока не добавлено.
+                </div>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-warning text-center" role="alert">
+                Ваш профиль врача не найден. Пожалуйста, убедитесь, что ваш аккаунт связан с профилем врача в админ-панели.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

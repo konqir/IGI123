@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}О компании - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <h1 class="text-center mb-4">О нашем Косметологическом центре</h1>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                {% if company_info %}
+                    <p class="card-text">{{ company_info.text_content|linebreaksbr }}</p>
+                {% else %}
+                    <div class="alert alert-info text-center" role="alert">
+                        Информация о компании пока не добавлена.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <h3 class="text-center mt-5 mb-4">Наша миссия</h3>
+        <p class="text-center lead">
+            Мы стремимся к тому, чтобы каждый наш клиент чувствовал себя уверенно и прекрасно,
+            предлагая высококачественные косметологические услуги, основанные на последних достижениях науки и индивидуальном подходе.
+        </p>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'core:contacts' %}" class="btn btn-primary btn-lg">Наши специалисты</a>
+            <a href="{% url 'core:service_list' %}" class="btn btn-outline-primary btn-lg ms-3">Наши услуги</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

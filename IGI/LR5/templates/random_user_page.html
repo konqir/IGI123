@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Случайный пользователь - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="text-center mb-4">Данные случайного пользователя</h1>
+        <p class="lead text-center mb-5">Получено от <a href="https://randomuser.me/" target="_blank" rel="noopener noreferrer">RandomUser API</a></p>
+
+        <div class="card shadow-sm mb-4 p-4 text-center">
+            {% if user %}
+                <img src="{{ user.picture.large }}" class="img-fluid rounded-circle mb-3 mx-auto" alt="[Image of User]" style="width: 150px; height: 150px; object-fit: cover;">
+                <h3 class="text-primary">{{ user.name.first }} {{ user.name.last }}</h3>
+                <p class="lead">{{ user.email }}</p>
+                <ul class="list-unstyled text-start mx-auto" style="max-width: 300px;">
+                    <li><i class="fas fa-venus-mars me-2 text-info"></i> Пол: {{ user.gender }}</li>
+                    <li><i class="fas fa-phone-alt me-2 text-success"></i> Телефон: {{ user.phone }}</li>
+                    <li><i class="fas fa-map-marker-alt me-2 text-danger"></i> Адрес: {{ user.location.street.number }} {{ user.location.street.name }}, {{ user.location.city }}, {{ user.location.state }}, {{ user.location.country }}</li>
+                    <li><i class="fas fa-calendar-alt me-2 text-warning"></i> Дата рождения: {{ user.dob.date|date:"d/m/Y" }} (Возраст: {{ user.dob.age }})</li>
+                </ul>
+                <button class="btn btn-primary mt-4" onclick="window.location.reload();">
+                    <i class="fas fa-sync-alt me-2"></i>Получить другого пользователя
+                </button>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    Не удалось загрузить данные пользователя. Пожалуйста, попробуйте обновить страницу.
+                </div>
+                <button class="btn btn-primary mt-4" onclick="window.location.reload();">
+                    <i class="fas fa-redo me-2"></i>Повторить попытку
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

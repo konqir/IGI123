@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <h1 class="text-center mb-4">{{ title }}</h1>
+        <p class="lead text-center mb-5">Полный список всех записей на прием в хронологическом порядке.</p>
+
+        {% if all_appointments %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped shadow-sm rounded overflow-hidden">
+                    <thead class="table-primary">
+                        <tr>
+                            <th scope="col">Дата</th>
+                            <th scope="col">Время</th>
+                            <th scope="col">Клиент</th>
+                            <th scope="col">Врач</th>
+                            <th scope="col">Услуга</th>
+                            <th scope="col">Стоимость</th>
+                            <th scope="col">Статус</th>
+                            <th scope="col">Примечания</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in all_appointments %}
+                        <tr>
+                            <td>{{ appointment.date|date:"d/m/Y" }}</td>
+                            <td>{{ appointment.start_time|time:"H:i" }} - {{ appointment.end_time|time:"H:i" }}</td>
+                            <td>{{ appointment.client.user.first_name }} {{ appointment.client.user.last_name }} ({{ appointment.client.user.username }})</td>
+                            <td>{{ appointment.doctor.get_full_name }}</td>
+                            <td>{{ appointment.service.name|default:"Не указана" }}</td>
+                            <td>{{ appointment.total_price }} руб.</td>
+                            <td>
+                                {% if appointment.status == 'planned' %}
+                                    <span class="badge bg-info">Запланирован</span>
+                                {% elif appointment.status == 'completed' %}
+                                    <span class="badge bg-success">Завершен</span>
+                                {% elif appointment.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Отменен</span>
+                                {% elif appointment.status == 'no-show' %}
+                                    <span class="badge bg-warning text-dark">Неявка</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ appointment.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ appointment.notes|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Пагинация #}
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a></li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}\
+                        {% if page_obj.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                На данный момент нет записей на прием.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Промокоды - Косметологический центр{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <h1 class="text-center mb-4">Наши актуальные промокоды</h1>
+        <p class="lead text-center mb-5">Используйте наши промокоды для получения скидок на услуги!</p>
+
+        {% if promo_codes %}
+            <div class="row">
+                {% for promo in promo_codes %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm text-center">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary mb-3">{{ promo.code }}</h5>
+                            <p class="card-text">
+                                <span class="badge bg-success fs-5 mb-3">{{ promo.discount_percentage|floatformat:"0" }}% Скидка</span>
+                            </p>
+                            {% if promo.expiration_date %}
+                                <p class="card-text text-muted small">Действует до: {{ promo.expiration_date|date:"d/m/Y" }}</p>
+                            {% else %}
+                                <p class="card-text text-muted small">Срок действия не ограничен</p>
+                            {% endif %}
+                            <p class="card-text flex-grow-1">
+                                <small class="text-info">Добавлен: {{ promo.date_added|date:"d/m/Y" }}</small>
+                            </p>
+                            <button class="btn btn-outline-primary btn-sm copy-promo-btn mt-auto" data-code="{{ promo.code }}">
+                                <i class="fas fa-copy me-2"></i>Скопировать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Пагинация #}
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a></li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                На данный момент активных промокодов нет.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyButtons = document.querySelectorAll('.copy-promo-btn');
+        copyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const promoCode = this.dataset.code;
+                const tempInput = document.createElement('textarea');
+                tempInput.value = promoCode;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                
+                // Изменяем текст кнопки для обратной связи
+                this.textContent = 'Скопировано!';
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-success');
+                
+                // Возвращаем исходный текст через несколько секунд
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-copy me-2"></i>Скопировать';
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-outline-primary');
+                }, 2000);
+            });
+        });
+    });
+</script>
+{% endblock %}
