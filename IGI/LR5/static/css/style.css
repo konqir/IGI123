@@ -1,0 +1,172 @@
+/* static/css/style.css */
+
+/* Общие стили для проекта */
+body {
+    font-family: 'Inter', sans-serif;
+    /* Убираем overflow-x: hidden; чтобы не обрезать контент,
+       вместо этого будем работать над предотвращением переполнения */
+    /* overflow-x: hidden; */
+}
+
+/* Убедимся, что все изображения адаптивны */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block; /* Убираем лишний отступ под изображениями */
+}
+
+/* Стили из base.html, если они были в <style> теге, лучше перенести сюда */
+.navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+.navbar-brand {
+    font-weight: bold;
+    color: #4a90e2 !important;
+    /* Убедимся, что бренд не вызывает переполнения на очень маленьких экранах */
+    white-space: normal; /* Разрешаем тексту переноситься */
+    word-break: break-word; /* Разрываем длинные слова */
+    flex-shrink: 0; /* Запрещаем ему слишком сильно сжиматься */
+    margin-right: 1rem; /* Добавляем небольшой отступ справа */
+}
+.nav-link {
+    color: #495057 !important;
+    border-radius: 0.3rem;
+    transition: background-color 0.3s ease;
+}
+.nav-link:hover {
+    background-color: #e9ecef;
+}
+.footer {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 2rem 0;
+    margin-top: 3rem;
+    border-radius: 0.5rem;
+}
+.container {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    /* Убедимся, что сам контейнер не вызывает переполнения */
+    max-width: 100%; /* Явно устанавливаем максимальную ширину */
+    /* overflow-x: hidden; */ /* Не скрываем, а предотвращаем. Если проблема останется, можно вернуть. */
+    box-sizing: border-box;
+}
+.card {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,.07);
+    border: none;
+}
+.btn-primary {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+.btn-primary:hover {
+    background-color: #357ABD;
+    border-color: #357ABD;
+}
+.btn-outline-primary {
+    border-color: #4a90e2;
+    color: #4a90e2;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background-color: #4a90e2;
+    color: #ffffff;
+}
+.pagination .page-link {
+    border-radius: 0.5rem;
+    margin: 0 0.2rem;
+}
+.alert {
+    border-radius: 0.5rem;
+}
+
+/* Дополнительные стили для предотвращения переполнения в навигации на очень маленьких экранах */
+@media (max-width: 991.98px) { /* breakpoint 'lg' в Bootstrap */
+    .navbar-nav {
+        flex-wrap: wrap; /* Позволяет элементам переноситься на новую строку */
+        /* Убедимся, что nav-items не выходят за пределы navbar */
+        width: 100%; /* Занимают всю ширину свернутого меню */
+    }
+    .nav-item {
+        width: 100%; /* Каждый пункт меню занимает всю ширину */
+        text-align: center;
+        margin-bottom: 0.5rem; /* Небольшой отступ между пунктами */
+    }
+    .nav-item:last-child {
+        margin-bottom: 0;
+    }
+    /* Уменьшаем отступы для nav-links на маленьких экранах, чтобы сделать их более компактными */
+    .nav-link {
+        padding: 0.5rem 0.75rem; /* Меньшие отступы */
+    }
+    /* Корректируем выпадающие меню, если они также вызывают переполнение */
+    .dropdown-menu {
+        width: 100%;
+        text-align: center;
+    }
+    .dropdown-item {
+        white-space: normal; /* Разрешаем тексту переноситься */
+        word-break: break-word;
+    }
+}
+
+/* Новые правила для общей адаптивности */
+/* Убедимся, что все элементы, которые могут быть слишком широкими, корректно сжимаются */
+* {
+    box-sizing: border-box; /* Гарантируем, что padding и border не увеличивают ширину элемента */
+}
+
+/* Для форм и полей ввода, чтобы они не выходили за пределы контейнера */
+form, input, select, textarea {
+    max-width: 100%;
+}
+
+/* Для таблиц, чтобы они были адаптивными */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Для плавного скролла на iOS */
+}
+
+/* Если проблема в конкретных строках или столбцах Bootstrap,
+   можно добавить более специфичные правила, например: */
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+.col, [class*="col-"] {
+    padding-left: 0.75rem; /* Стандартный padding Bootstrap */
+    padding-right: 0.75rem;
+}
+
+/* Убедимся, что ни один элемент не имеет фиксированной ширины, которая нарушает макет */
+div, section, header, footer, main, nav, article, aside {
+    min-width: 0; /* Позволяем гибким элементам сжиматься ниже их размера содержимого */
+}
+
+/* Для конкретного случая кнопок навигации справа (вход/регистрация) */
+@media (max-width: 991.98px) {
+    .navbar-nav.ms-auto { /* Целевые элементы навигации, выровненные по правому краю */
+        flex-direction: column; /* Располагаем их вертикально */
+        align-items: center; /* Центрируем */
+        width: 100%; /* Занимают всю ширину */
+        margin-top: 1rem; /* Добавляем небольшой отступ от основных пунктов навигации */
+    }
+    .navbar-nav.ms-auto .nav-item {
+        margin-bottom: 0.5rem;
+        width: auto; /* Позволяем кнопкам изменять размер в зависимости от содержимого */
+    }
+    .navbar-nav.ms-auto .nav-item:last-child {
+        margin-bottom: 0;
+    }
+    .navbar-nav.ms-auto .btn {
+        width: 100%; /* Делаем кнопки полной ширины внутри их nav-item */
+        max-width: 200px; /* Ограничиваем ширину кнопок для лучшего внешнего вида */
+    }
+}

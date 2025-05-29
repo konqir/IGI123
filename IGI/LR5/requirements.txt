@@ -1,0 +1,7 @@
+Django==5.0.*
+requests==2.*
+python-decouple==3.*
+matplotlib==3.*
+Pillow==10.*
+django-crispy-forms==2.*
+crispy-bootstrap5==2025.4
